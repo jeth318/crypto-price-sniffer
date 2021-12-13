@@ -12,8 +12,8 @@ setInterval(async () => {
   const { data } = await client.account();
   const assets = getAssets(data);
   const signature = sha256(JSON.stringify(assets));
-
-  if (await isUniqueSignature(signature)) {
-    updatePrices(assets);
+  const updatedAssets = await isUniqueSignature(signature, assets);
+  if (updatedAssets.length) {
+    updatePrices(updatedAssets);
   }
-}, POLL_INTERVAL);
+}, 4000);
