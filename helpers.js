@@ -5,7 +5,7 @@ const axios = require('axios');
 const coinList = require('./complete-coinlist.json');
 
 const getAssets = (data) => {
-  return data?.balances?.filter(
+  return data.balances.filter(
     (asset) => parseFloat(asset.free) > 0 || parseFloat(asset.locked) > 0
   );
 };
