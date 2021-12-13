@@ -16,4 +16,4 @@ setInterval(async () => {
   if (updatedAssets.length) {
     updatePrices(updatedAssets);
   }
-}, 4000);
+}, POLL_INTERVAL);
