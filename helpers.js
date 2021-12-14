@@ -1,8 +1,7 @@
-const { cryptoSymbol } = require('crypto-symbol');
+const { cryptoSymbol } = require("crypto-symbol");
 const { nameLookup } = cryptoSymbol({});
-const axios = require('axios');
-
-const coinList = require('./complete-coinlist.json');
+const axios = require("axios");
+const coinList = require("./complete-coinlist.json");
 
 const getAssets = (data) => {
   return data.balances.filter(
@@ -11,10 +10,10 @@ const getAssets = (data) => {
 };
 
 const getGeckoSymbolFromGeckoId = (geckoId) => {
-  const matches = coinList.filter(
-    (c) => c.id.toUpperCase() === geckoId.toUpperCase()
+  const match = coinList.find(
+    (coin) => coin.id.toLocaleUpperCase() === geckoId.toUpperCase()
   );
-  return matches.length ? matches[0].symbol : null;
+  return match ? match.symbol : null;
 };
 
 const getGeckoIdFromSymbol = (symbol) => {
@@ -48,11 +47,19 @@ const getPriceData = async (ids) => {
   }));
 };
 
+const printInfoMessage = (userSignature) => {
+  console.log(`
+  New walletSignature detected for user ${userSignature}.
+  Assets have changed since the previous poll.
+  Fetching price data for the affected assets and uploading the results to the database.`
+)};
+
 module.exports = {
   getAssets,
   getGeckoIdsFromAssets,
   getGeckoSymbolFromGeckoId,
   getCoinNames,
   getGeckoIdFromSymbol,
-  getPriceData
+  getPriceData,
+  printInfoMessage,
 };
