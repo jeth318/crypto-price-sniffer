@@ -5,32 +5,34 @@ const coinList = require("./complete-coinlist.json");
 
 const getAssets = (data) => {
   return data.balances.filter(
-    (asset) => parseFloat(asset.free) > 0 || parseFloat(asset.locked) > 0
+    ({ free, locked }) => parseFloat(free) > 0 || parseFloat(locked) > 0
   );
 };
 
 const getGeckoSymbolFromGeckoId = (geckoId) => {
   const match = coinList.find(
-    (coin) => coin.id.toLocaleUpperCase() === geckoId.toUpperCase()
+    ({ id }) => id.toLocaleUpperCase() === geckoId.toUpperCase()
   );
   return match ? match.symbol : null;
 };
 
 const getGeckoIdFromSymbol = (symbol) => {
-  const matches = coinList.filter((c) => c.symbol.toUpperCase() === symbol);
+  const matches = coinList.filter(
+    (coin) => coin.symbol.toUpperCase() === symbol
+  );
   return matches.length ? matches[0].id : null;
 };
 
 const getCoinNames = (assets) =>
-  assets.map((coin) => ({
-    name: nameLookup(coin.asset),
-    symbol: coin.asset,
-    geckoId: getGeckoIdFromSymbol(coin.asset),
+  assets.map(({ asset }) => ({
+    name: nameLookup(asset),
+    symbol: asset,
+    geckoId: getGeckoIdFromSymbol(asset),
   }));
 
 const getGeckoIdsFromAssets = (assets) =>
   getCoinNames(assets)
-    .map((coin) => coin.geckoId)
+    .map(({ geckoId }) => geckoId)
     .filter((id) => !!id);
 
 const getPriceData = async (ids) => {
@@ -51,8 +53,8 @@ const printInfoMessage = (userSignature) => {
   console.log(`
   New walletSignature detected for user ${userSignature}.
   Assets have changed since the previous poll.
-  Fetching price data for the affected assets and uploading the results to the database.`
-)};
+  Fetching price data for the affected assets and uploading the results to the database.`);
+};
 
 module.exports = {
   getAssets,
