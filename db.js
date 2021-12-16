@@ -5,6 +5,7 @@ const {
   getGeckoIdsFromAssets,
   getPriceData,
   printInfoMessage,
+  verifyPriceData
 } = require("./helpers");
 
 const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${MONGODB_ENDPOINT}`;
@@ -17,7 +18,9 @@ const uploadPrices = async (assets) => {
     const db = client.db(dbName);
     const collection = db.collection("prices");
     const geckoIds = getGeckoIdsFromAssets(assets);
-    await collection.insertMany(await getPriceData(geckoIds));
+    const priceData = await getPriceData(geckoIds);
+    verifyPriceData(assets, geckoIds, priceData);
+    priceData.length && await collection.insertMany(priceData);
     client.close();
   } catch (error) {
     console.log("Error while updating the datebase:", error);
@@ -53,9 +56,9 @@ const getClosestMatch = async ({ time, symbol }) => {
 };
 
 const findChangedAssets = async(previousAssets, assets) => {
-  return previousAssets.filter((pa) => {
-    const comp = assets.find((a) => a.asset === pa.asset);
-    return comp ? comp.free !== pa.free || comp.locked !== pa.locked : pa.asset;
+  return assets.filter(({ asset, locked, free }) => {
+    const comp = previousAssets.find((pa) => pa.asset === asset);
+    return comp ? comp.free !== free || comp.locked !== locked : asset;
   });
 }
 
