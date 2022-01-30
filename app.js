@@ -1,8 +1,9 @@
-require("dotenv").config();
-const { getChangedAssets, uploadPrices } = require("./db");
-const { getAssets } = require("./helpers");
-const { sha256 } = require("js-sha256");
-const { Spot } = require("@binance/connector");
+require('dotenv').config();
+const { sha256 } = require('js-sha256');
+const { Spot } = require('@binance/connector');
+const { getChangedAssets, uploadPrices } = require('./db');
+const { getAssets } = require('./helpers');
+
 const apiKey = process.env.BINANCE_API_KEY;
 const apiSecret = process.env.BINANCE_API_SECRET;
 const userSignature = sha256(apiKey + apiSecret);

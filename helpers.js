@@ -1,13 +1,29 @@
-const { cryptoSymbol } = require("crypto-symbol");
-const { nameLookup } = cryptoSymbol({});
-const axios = require("axios");
-const coinList = require("./complete-coinlist.json");
+const { cryptoSymbol } = require('crypto-symbol');
 
-const getAssets = (data) => {
-  return data.balances.filter(
+const { nameLookup } = cryptoSymbol({});
+const axios = require('axios');
+const coinList = require('./complete-coinlist.json');
+
+const printInfoMessage = (userSignature) => {
+  /* eslint-disable-next-line no-console */
+  console.log(`
+  New walletSignature detected for user ${userSignature}.
+  Assets have changed since the previous poll.
+  Fetching price data for the affected assets and uploading the results to the database.`);
+};
+
+const printMissingCoinsMessage = (symbols) => {
+  /* eslint-disable-next-line no-console */
+  console.log(`
+  No coins could be matched in CoinGecko for the following symbols: ${symbols}.
+  This means that no price data could be uploaded for these coins.
+  `);
+};
+
+const getAssets = (data) =>
+  data.balances.filter(
     ({ free, locked }) => parseFloat(free) > 0 || parseFloat(locked) > 0
   );
-};
 
 const getGeckoSymbolFromGeckoId = (geckoId) => {
   const match = coinList.find(
@@ -51,27 +67,17 @@ const getPriceData = async (ids) => {
 
 const verifyPriceData = (assets = [], geckoIds = [], priceData = []) => {
   if (assets.length !== geckoIds.length) {
-    const assetsSymbols = assets.map(asset => asset.asset.toUpperCase());
-    const missingSymbols = assetsSymbols.filter(symbol =>
-      !priceData.find(pd => symbol.toUpperCase() === pd.symbol.toUpperCase()));
+    const assetsSymbols = assets.map((asset) => asset.asset.toUpperCase());
+    const missingSymbols = assetsSymbols.filter(
+      (symbol) =>
+        !priceData.find(
+          (pd) => symbol.toUpperCase() === pd.symbol.toUpperCase()
+        )
+    );
     if (missingSymbols.length) {
       printMissingCoinsMessage(missingSymbols);
     }
   }
-} 
-
-const printInfoMessage = (userSignature) => {
-  console.log(`
-  New walletSignature detected for user ${userSignature}.
-  Assets have changed since the previous poll.
-  Fetching price data for the affected assets and uploading the results to the database.`);
-};
-
-const printMissingCoinsMessage = (symbols) => {
-  console.log(`
-  No coins could be matched in CoinGecko for the following symbols: ${symbols}.
-  This means that no price data could be uploaded for these coins.
-  `);
 };
 
 module.exports = {
