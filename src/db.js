@@ -1,19 +1,21 @@
-require('dotenv').config({ path: '../.env' });
-const { MongoClient } = require('mongodb');
+import {} from 'dotenv/config';
+//dotenv.config({ path: '../.env' });
+import { MongoClient } from 'mongodb';
 
 const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
-const {
+import {
   getGeckoIdsFromAssets,
   getPriceData,
   printInfoMessage,
   verifyPriceData,
-} = require('./helpers');
+} from './helpers.js';
 
+console.log('process.env', process.env);
 const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${MONGODB_ENDPOINT}`;
 const client = new MongoClient(url);
 const dbName = process.env.DB_NAME;
 
-const uploadPrices = async (assets) => {
+export const uploadPrices = async (assets) => {
   try {
     await client.connect();
     const db = client.db(dbName);
@@ -33,7 +35,7 @@ const uploadPrices = async (assets) => {
 };
 
 // Work in progress
-const getClosestMatch = async ({ info, symbol }) => {
+export const getClosestMatch = async ({ info, symbol }) => {
   try {
     await client.connect();
     const db = client.db(dbName);
@@ -63,13 +65,17 @@ const getClosestMatch = async ({ info, symbol }) => {
   }
 };
 
-const findChangedAssets = async (previousAssets, assets) =>
+export const findChangedAssets = async (previousAssets, assets) =>
   assets.filter(({ asset, locked, free }) => {
     const comp = previousAssets.find((pa) => pa.asset === asset);
     return comp ? comp.free !== free || comp.locked !== locked : asset;
   });
 
-const getChangedAssets = async (userSignature, walletSignature, assets) => {
+export const getChangedAssets = async (
+  userSignature,
+  walletSignature,
+  assets
+) => {
   try {
     await client.connect();
     const db = client.db(dbName);
@@ -101,5 +107,3 @@ const getChangedAssets = async (userSignature, walletSignature, assets) => {
     return null;
   }
 };
-
-module.exports = { uploadPrices, getChangedAssets, getClosestMatch };

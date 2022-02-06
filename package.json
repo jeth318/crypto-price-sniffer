@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "private",
   "dependencies": {
+    "@babel/preset-env": "^7.16.11",
     "@binance/connector": "^1.6.0",
     "axios": "^0.24.0",
     "crypto-symbol": "^3.2.0",
@@ -19,10 +21,12 @@
     "node-binance-api": "^0.13.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.17.0",
     "eslint": "^8.8.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-prettier": "^4.0.0"
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.4.7"
   }
 }
