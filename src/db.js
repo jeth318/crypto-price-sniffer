@@ -1,16 +1,17 @@
 import dotenv from 'dotenv';
-import { MongoClient } from 'mongodb';
+import * as mongodb from 'mongodb';
 import {
   getGeckoIdsFromAssets,
   getPriceData,
   printInfoMessage,
   verifyPriceData,
+  findChangedAssets,
 } from './helpers.js';
 dotenv.config();
 
 const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
 const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${MONGODB_ENDPOINT}`;
-const client = new MongoClient(url);
+const client = new mongodb.MongoClient(url);
 const dbName = process.env.DB_NAME;
 
 export const uploadPrices = async (assets) => {
@@ -33,6 +34,7 @@ export const uploadPrices = async (assets) => {
 };
 
 // Work in progress
+/* istanbul ignore next */
 export const getClosestMatch = async ({ info, symbol }) => {
   try {
     await client.connect();
@@ -63,12 +65,6 @@ export const getClosestMatch = async ({ info, symbol }) => {
   }
 };
 
-export const findChangedAssets = async (previousAssets, assets) =>
-  assets.filter(({ asset, locked, free }) => {
-    const comp = previousAssets.find((pa) => pa.asset === asset);
-    return comp ? comp.free !== free || comp.locked !== locked : asset;
-  });
-
 export const getChangedAssets = async (
   userSignature,
   walletSignature,
@@ -82,7 +78,6 @@ export const getChangedAssets = async (
       userSignature,
       walletSignature,
     });
-    console.log('signatureMatch', signatureMatch);
     if (!signatureMatch) {
       const lastEntry = collection
         .find({ userSignature })

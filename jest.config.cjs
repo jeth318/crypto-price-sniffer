@@ -2,6 +2,7 @@ module.exports = {
   preset: '@shelf/jest-mongodb',
   setupFiles: ['<rootDir>/jest.vars.js'],
   timers: 'fake',
+  automock: false,
   collectCoverageFrom: ['src/**/*.js'],
   coveragePathIgnorePatterns: [
     'node_modules',

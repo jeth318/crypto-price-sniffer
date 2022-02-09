@@ -1,36 +1,30 @@
+import * as mockMongoDb from '../__mocks__/mongodb.cjs';
 import * as db from '../src/db';
 import * as helpers from '../src/helpers';
-let mockInsertMany = jest.fn(async () => Promise.resolve('insertMany'));
-let mockFindOne = jest.fn(async () => Promise.resolve('findOne'));
-let mockInsertOne = jest.fn(async () => Promise.resolve('insertOne'));
+jest.mock('mongodb', () => mockMongoDb);
 
-let mockCollection = jest.fn(() => ({
-  insertMany: mockInsertMany,
-  insertOne: mockInsertOne,
-  findOne: mockFindOne,
-}));
-
-jest.mock('mongodb', () => ({
-  MongoClient: () => ({
-    connect: async () => Promise.resolve('connected'),
-    close: jest.fn(),
-    db: () => ({
-      collection: mockCollection,
-    }),
-  }),
-}));
-jest.mock('crypto-symbol', () => ({
-  cryptoSymbol: jest.fn(() => ({
-    nameLookup: jest.fn(() => 'nameLookupMock'),
-  })),
-}));
 describe('db', () => {
   let getGeckoIdsFromAssetsStub;
+  let consoleStub;
+  let findChangedAssetsStub;
+  let printInfoMessageStub;
 
   beforeEach(() => {
+    mockMongoDb.mockFindOne.mockImplementation(async () => null);
+    mockMongoDb.mockToArray.mockImplementation(() => [
+      { assets: ['assetA'] },
+      { assets: ['assetB'] },
+    ]);
+    printInfoMessageStub = jest
+      .spyOn(helpers, 'printInfoMessage')
+      .mockImplementation(() => null);
+    findChangedAssetsStub = jest
+      .spyOn(helpers, 'findChangedAssets')
+      .mockImplementation(() => 'changedAssets');
     getGeckoIdsFromAssetsStub = jest
       .spyOn(helpers, 'getGeckoIdsFromAssets')
       .mockImplementation(() => ['gid1, gid2']);
+    consoleStub = jest.spyOn(console, 'log').mockImplementation(() => null);
   });
 
   afterEach(() => {
@@ -38,7 +32,7 @@ describe('db', () => {
   });
 
   describe('uploadPrices', () => {
-    it('should work', async () => {
+    it('should call insertMany with correct arguments', async () => {
       let getPriceDataStub = jest
         .spyOn(helpers, 'getPriceData')
         .mockImplementation(async () => Promise.resolve('priceData'));
@@ -51,7 +45,7 @@ describe('db', () => {
 
       expect(getGeckoIdsFromAssetsStub).toHaveBeenCalledWith(assets);
       expect(getPriceDataStub).toHaveBeenCalledWith(['gid1, gid2']);
-      expect(mockInsertMany).toHaveBeenCalledWith('priceData');
+      expect(mockMongoDb.mockInsertMany).toHaveBeenCalledWith('priceData');
       expect(verifyPriceDataStub).toHaveBeenCalledWith(
         assets,
         ['gid1, gid2'],
@@ -59,10 +53,10 @@ describe('db', () => {
       );
     });
 
-    it('should not work', async () => {
+    it('should not call insertMany when promise rejects', async () => {
       let getPriceDataStub = jest
         .spyOn(helpers, 'getPriceData')
-        .mockImplementation(async () => Promise.resolve([]));
+        .mockImplementation(async () => Promise.reject(new Error('oops')));
       let verifyPriceDataStub = jest
         .spyOn(helpers, 'verifyPriceData')
         .mockImplementation(() => null);
@@ -72,62 +66,87 @@ describe('db', () => {
 
       expect(getGeckoIdsFromAssetsStub).toHaveBeenCalledWith(assets);
       expect(getPriceDataStub).toHaveBeenCalledWith(['gid1, gid2']);
-      expect(mockInsertMany).not.toHaveBeenCalled();
-      expect(verifyPriceDataStub).toHaveBeenCalledWith(
-        assets,
-        ['gid1, gid2'],
-        []
-      );
-    });
-  });
-
-  describe('findChangedAssets', () => {
-    it('should return changed assets', async () => {
-      const previousAssets = [
-        {
-          free: 1,
-          locked: 1,
-          asset: 'asset1',
-        },
-        {
-          free: 1,
-          locked: 0,
-          asset: 'asset2',
-        },
-      ];
-
-      const assets = [
-        {
-          free: 1,
-          locked: 1,
-          asset: 'asset1',
-        },
-        {
-          free: 1,
-          locked: 1,
-          asset: 'asset2',
-        },
-      ];
-      const changedAssets = [assets[1]];
-      expect(await db.findChangedAssets(previousAssets, assets)).toEqual(
-        changedAssets
+      expect(mockMongoDb.mockInsertMany).not.toHaveBeenCalled();
+      expect(verifyPriceDataStub).not.toHaveBeenCalled();
+      expect(consoleStub).toHaveBeenCalledTimes(1);
+      expect(consoleStub).toHaveBeenCalledWith(
+        'Error while updating the datebase:',
+        new Error('oops')
       );
     });
   });
 
   describe('getChangedAssets', () => {
-    it('should return empty array when no signature match is found', async () => {
-      const assets = [
+    const defaultPayload = [
+      'userSignature',
+      'walletSignature',
+      [
         {
           free: 1,
           locked: 1,
-          asset: 'asset1',
+          asset: 'asset',
         },
-      ];
+      ],
+    ];
+    it('should return an empty array when signature match is found', async () => {
+      mockMongoDb.mockFindOne.mockImplementation(async () => 'one');
 
-      expect(
-        await db.getChangedAssets('userSignature', 'walletSignature', assets)
-      ).toEqual([]);
+      expect(await db.getChangedAssets(...defaultPayload)).toEqual([]);
+    });
+
+    it('should call insertOne with correct arguments when no signature match is found', async () => {
+      const result = await db.getChangedAssets(...defaultPayload);
+      expect(result).toEqual('changedAssets');
+    });
+
+    it('should call printInfoMessage with correct correct argument', async () => {
+      const result = await db.getChangedAssets(...defaultPayload);
+      expect(result).toEqual('changedAssets');
+      expect(printInfoMessageStub).toHaveBeenCalledTimes(1);
+      expect(printInfoMessageStub).toHaveBeenCalledWith('userSignature');
+    });
+
+    it('should default previousAssets to empty array when no last entry length', async () => {
+      mockMongoDb.mockToArray.mockImplementation(async () => []);
+      const result = await db.getChangedAssets(...defaultPayload);
+      expect(result).toEqual('changedAssets');
+      expect(findChangedAssetsStub).toHaveBeenCalledWith(
+        [],
+        [
+          {
+            free: 1,
+            locked: 1,
+            asset: 'asset',
+          },
+        ]
+      );
+    });
+    it('should call findChangedAssets with correct arguments', async () => {
+      consoleStub.mockRestore();
+      const result = await db.getChangedAssets(...defaultPayload);
+      expect(result).toEqual('changedAssets');
+      expect(findChangedAssetsStub).toHaveBeenCalledWith(
+        ['assetA'],
+        [
+          {
+            free: 1,
+            locked: 1,
+            asset: 'asset',
+          },
+        ]
+      );
+    });
+
+    it('should print error log with correct information when failing', async () => {
+      mockMongoDb.mockFindOne.mockImplementationOnce(() =>
+        Promise.reject(new Error('oops'))
+      );
+      await db.getChangedAssets(...defaultPayload);
+      expect(findChangedAssetsStub).not.toHaveBeenCalled();
+      expect(consoleStub).toHaveBeenCalledWith(
+        'Error while verifying signature:',
+        new Error('oops')
+      );
     });
   });
 });

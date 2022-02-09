@@ -24,4 +24,4 @@ export const run = async () => {
     uploadPrices(changedAssets);
   }
 };
-setInterval(run, POLL_INTERVAL);
+setInterval(run, 2000);

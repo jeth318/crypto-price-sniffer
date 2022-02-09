@@ -21,6 +21,12 @@ export const getAssets = (data) =>
     ({ free, locked }) => parseFloat(free) > 0 || parseFloat(locked) > 0
   );
 
+export const findChangedAssets = async (previousAssets, assets) =>
+  assets.filter(({ asset, locked, free }) => {
+    const comp = previousAssets.find((pa) => pa.asset === asset);
+    return comp ? comp.free !== free || comp.locked !== locked : asset;
+  });
+
 export const getGeckoSymbolFromGeckoId = (geckoId) => {
   const match = coinList.find(
     ({ id }) => id.toLocaleUpperCase() === geckoId.toUpperCase()

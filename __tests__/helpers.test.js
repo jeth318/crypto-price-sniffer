@@ -70,6 +70,40 @@ describe('helpers', () => {
     });
   });
 
+  describe('findChangedAssets', () => {
+    it('should return changed assets', async () => {
+      const previousAssets = [
+        {
+          free: 1,
+          locked: 1,
+          asset: 'asset1',
+        },
+        {
+          free: 1,
+          locked: 0,
+          asset: 'asset2',
+        },
+      ];
+
+      const assets = [
+        {
+          free: 1,
+          locked: 1,
+          asset: 'asset1',
+        },
+        {
+          free: 1,
+          locked: 1,
+          asset: 'asset2',
+        },
+      ];
+      const changedAssets = [assets[1]];
+      expect(await helpers.findChangedAssets(previousAssets, assets)).toEqual(
+        changedAssets
+      );
+    });
+  });
+
   describe('getGeckoSymbolFromGeckoId', () => {
     it('should return symbol matching the given id', () => {
       expect(helpers.getGeckoSymbolFromGeckoId('bitcoin')).toEqual('btc');
