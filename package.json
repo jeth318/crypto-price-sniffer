@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node --experimental-json-modules src/app.js",
     "test": "jest --coverage"
   },
   "keywords": [],
