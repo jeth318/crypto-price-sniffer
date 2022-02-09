@@ -1,8 +1,7 @@
-import {} from 'dotenv/config';
-//dotenv.config({ path: '../.env' });
+import dotenv from 'dotenv';
+dotenv.config();
 import { MongoClient } from 'mongodb';
 
-const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
 import {
   getGeckoIdsFromAssets,
   getPriceData,
@@ -10,7 +9,7 @@ import {
   verifyPriceData,
 } from './helpers.js';
 
-console.log('process.env', process.env);
+const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
 const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${MONGODB_ENDPOINT}`;
 const client = new MongoClient(url);
 const dbName = process.env.DB_NAME;
@@ -84,7 +83,7 @@ export const getChangedAssets = async (
       userSignature,
       walletSignature,
     });
-
+    console.log('signatureMatch', signatureMatch);
     if (!signatureMatch) {
       const lastEntry = collection
         .find({ userSignature })

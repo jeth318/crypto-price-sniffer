@@ -2,12 +2,6 @@ import * as helpers from '../src/helpers';
 import axios from 'axios';
 import * as messages from '../src/messages.en';
 jest.mock('axios');
-jest.mock('crypto-symbol', () => ({
-  cryptoSymbol: jest.fn(() => ({
-    nameLookup: jest.fn(() => 'nameLookupMock'),
-  })),
-}));
-
 describe('helpers', () => {
   let logStub;
   let getNewWalletSignatureMessageStub;

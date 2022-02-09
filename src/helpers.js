@@ -2,7 +2,7 @@ import cs from 'crypto-symbol';
 import axios from 'axios';
 import coinList from '../complete-coinlist.json';
 import * as helpers from './helpers.js';
-import * as messages from './messages.en';
+import * as messages from './messages.en.js';
 
 const { nameLookup } = cs.cryptoSymbol({});
 
