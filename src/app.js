@@ -7,8 +7,7 @@ import { getAssets, printErrorMessage } from './helpers.js';
 dotenv.config();
 const apiKey = process.env.BINANCE_API_KEY;
 const apiSecret = process.env.BINANCE_API_SECRET;
-
-const POLL_INTERVAL = 2000;
+const pollInterval = process.env.POLL_INTERVAL || 60000;
 
 export const run = async () => {
   try {
@@ -30,4 +29,4 @@ export const run = async () => {
   }
 };
 
-export default setInterval(run, POLL_INTERVAL);
+export default setInterval(run, pollInterval);
