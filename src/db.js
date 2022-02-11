@@ -1,12 +1,15 @@
 import dotenv from 'dotenv';
 import * as mongodb from 'mongodb';
+
 import {
   getGeckoIdsFromAssets,
   getPriceData,
   printInfoMessage,
   verifyPriceData,
   findChangedAssets,
+  printUploadCompletedMessage,
 } from './helpers.js';
+
 dotenv.config();
 
 const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
@@ -25,6 +28,7 @@ export const uploadPrices = async (assets) => {
     verifyPriceData(assets, geckoIds, priceData);
     if (priceData.length) {
       await collection.insertMany(priceData);
+      printUploadCompletedMessage(priceData);
     }
     client.close();
   } catch (error) {

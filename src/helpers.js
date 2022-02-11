@@ -16,6 +16,16 @@ export const printMissingCoinsMessage = (symbols) => {
   console.log(messages.getMissingCoinsMessage(symbols));
 };
 
+export const printUploadCompletedMessage = (priceData) => {
+  const assets = priceData
+    .map((asset) => asset.symbol.toUpperCase())
+    .toString()
+    .split(',')
+    .join(', ');
+  /* eslint-disable-next-line no-console */
+  console.log(messages.getUploadCompletedMessage(assets));
+};
+
 export const getAssets = (data) =>
   data.balances.filter(
     ({ free, locked }) => parseFloat(free) > 0 || parseFloat(locked) > 0
@@ -84,10 +94,9 @@ export const verifyPriceData = (assets = [], geckoIds = [], priceData = []) => {
           (pd) => symbol.toUpperCase() === pd.symbol.toUpperCase()
         )
     );
-
-    console.log('missingSymbols', missingSymbols);
+    console.log('MISSNIG', missingSymbols);
     if (missingSymbols.length) {
-      printMissingCoinsMessage(missingSymbols);
+      helpers.printMissingCoinsMessage(missingSymbols);
     }
   }
 };

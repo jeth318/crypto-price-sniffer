@@ -1,6 +1,7 @@
-module.exports = {
+export default {
   preset: '@shelf/jest-mongodb',
   setupFiles: ['<rootDir>/jest.vars.js'],
+  testEnvironment: 'node',
   timers: 'fake',
   automock: false,
   collectCoverageFrom: ['src/**/*.js'],

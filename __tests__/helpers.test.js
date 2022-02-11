@@ -1,11 +1,13 @@
-import * as helpers from '../src/helpers';
 import axios from 'axios';
+import * as helpers from '../src/helpers';
 import * as messages from '../src/messages.en';
+
 jest.mock('axios');
 describe('helpers', () => {
   let logStub;
   let getNewWalletSignatureMessageStub;
   let getMissingCoinsMessageStub;
+  let getUploadCompletedMessageStub;
 
   beforeEach(() => {
     logStub = jest.spyOn(console, 'log').mockImplementation(() => 'jonas');
@@ -16,6 +18,10 @@ describe('helpers', () => {
     getMissingCoinsMessageStub = jest
       .spyOn(messages, 'getMissingCoinsMessage')
       .mockImplementation(() => 'missingCoinsMessage');
+
+    getUploadCompletedMessageStub = jest
+      .spyOn(messages, 'getUploadCompletedMessage')
+      .mockImplementation(() => 'uploadCompletedMessage');
   });
 
   afterEach(() => {
@@ -37,6 +43,22 @@ describe('helpers', () => {
       helpers.printMissingCoinsMessage('SYMBOLS');
       expect(getMissingCoinsMessageStub).toHaveBeenCalledWith('SYMBOLS');
       expect(logStub).toHaveBeenCalledWith('missingCoinsMessage');
+    });
+  });
+
+  describe('printUploadCompletedMessage', () => {
+    it('should result in console.log with correct message when single asset', () => {
+      const priceData = [{ symbol: 'ada' }];
+      helpers.printUploadCompletedMessage(priceData);
+      expect(getUploadCompletedMessageStub).toHaveBeenCalledWith('ADA');
+      expect(logStub).toHaveBeenCalledWith('uploadCompletedMessage');
+    });
+
+    it('should result in console.log with correct message when multiple assets', () => {
+      const priceData = [{ symbol: 'ada' }, { symbol: 'aave' }];
+      helpers.printUploadCompletedMessage(priceData);
+      expect(getUploadCompletedMessageStub).toHaveBeenCalledWith('ADA, AAVE');
+      expect(logStub).toHaveBeenCalledWith('uploadCompletedMessage');
     });
   });
 
@@ -211,7 +233,7 @@ describe('helpers', () => {
       const result = await helpers.getPriceData(['btc']);
 
       expect(axios.get).toHaveBeenCalledWith(
-        `https://api.coingecko.com/api/v3/simple/price?ids=btc&vs_currencies=sek%2Cusd&include_last_updated_at=true`
+        'https://api.coingecko.com/api/v3/simple/price?ids=btc&vs_currencies=sek%2Cusd&include_last_updated_at=true'
       );
 
       expect(result).toEqual([
@@ -227,7 +249,7 @@ describe('helpers', () => {
     });
 
     it('should catch error and call it out through console log', async () => {
-      //axios.get.mockReturnValue(Promise.reject('error_123'));
+      // axios.get.mockReturnValue(Promise.reject('error_123'));
       axios.get.mockImplementation(() => {
         throw new Error('oops');
       });
@@ -240,7 +262,7 @@ describe('helpers', () => {
         );
 
         expect(axios.get).toHaveBeenCalledWith(
-          `https://api.coingecko.com/api/v3/simple/price?ids=btc&vs_currencies=sek%2Cusd&include_last_updated_at=true`
+          'https://api.coingecko.com/api/v3/simple/price?ids=btc&vs_currencies=sek%2Cusd&include_last_updated_at=true'
         );
       }
     });
@@ -309,13 +331,16 @@ describe('helpers', () => {
         .spyOn(helpers, 'printMissingCoinsMessage')
         .mockImplementation(() => 'geckoSymbol');
 
-      const assets = [{ asset: 'btc' }, { asset: 'notBtc' }];
+      const assets = [{ asset: 'btc' }, { asset: 'aave' }];
       const priceData = [{ symbol: 'geckoId1' }];
       const geckoIds = ['btc'];
 
       helpers.verifyPriceData(assets, geckoIds, priceData);
 
-      expect(printMissingCoinsMessageStub).not.toHaveBeenCalled();
+      expect(printMissingCoinsMessageStub).toHaveBeenCalledWith([
+        'BTC',
+        'AAVE',
+      ]);
     });
 
     it('should default all arguments as empty arrays', () => {

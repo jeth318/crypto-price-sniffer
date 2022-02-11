@@ -1,6 +1,7 @@
 import * as mockMongoDb from '../__mocks__/mongodb.cjs';
 import * as db from '../src/db';
 import * as helpers from '../src/helpers';
+
 jest.mock('mongodb', () => mockMongoDb);
 
 describe('db', () => {
@@ -33,10 +34,10 @@ describe('db', () => {
 
   describe('uploadPrices', () => {
     it('should call insertMany with correct arguments', async () => {
-      let getPriceDataStub = jest
+      const getPriceDataStub = jest
         .spyOn(helpers, 'getPriceData')
         .mockImplementation(async () => Promise.resolve('priceData'));
-      let verifyPriceDataStub = jest
+      const verifyPriceDataStub = jest
         .spyOn(helpers, 'verifyPriceData')
         .mockImplementation(() => null);
       const assets = [{ geckoId: 'gid', symbol: 'symbol' }];
@@ -54,10 +55,10 @@ describe('db', () => {
     });
 
     it('should not call insertMany when promise rejects', async () => {
-      let getPriceDataStub = jest
+      const getPriceDataStub = jest
         .spyOn(helpers, 'getPriceData')
         .mockImplementation(async () => Promise.reject(new Error('oops')));
-      let verifyPriceDataStub = jest
+      const verifyPriceDataStub = jest
         .spyOn(helpers, 'verifyPriceData')
         .mockImplementation(() => null);
       const assets = [{ geckoId: 'gid', symbol: 'symbol' }];

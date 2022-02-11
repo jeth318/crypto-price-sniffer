@@ -2,7 +2,7 @@ import * as mockBinanceConnector from '../__mocks__/@binance/connector.cjs';
 import * as mockSha256 from '../__mocks__/js-sha256.cjs';
 import * as db from '../src/db';
 import * as helpers from '../src/helpers';
-import * as app from '../src/app.js';
+import * as app from '../src/app';
 
 jest.mock('@binance/connector', () => mockBinanceConnector);
 jest.mock('js-sha256', () => mockSha256);
@@ -23,7 +23,7 @@ describe('app', () => {
         return 'changedAssets';
       });
 
-    uploadPricesStub = uploadPricesStub = jest
+    uploadPricesStub = jest
       .spyOn(db, 'uploadPrices')
       .mockImplementation(() => null);
   });

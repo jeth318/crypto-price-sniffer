@@ -2,11 +2,15 @@
   "name": "crypto-price-sniffer",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "exports": "./app.js",
   "type": "module",
+  "prepush": "npm run lint && npm run coverage && npm run coverage-check && npm run coverage-update",
   "scripts": {
     "start": "node --experimental-json-modules src/app.js",
-    "test": "jest --coverage"
+    "test": "./node_modules/.bin/jest",
+    "coverage": "./node_modules/.bin/jest --coverage",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +19,7 @@
     "@babel/preset-env": "^7.16.11",
     "@binance/connector": "^1.6.0",
     "axios": "^0.24.0",
+    "chalk": "^4.1.2",
     "crypto-symbol": "^3.2.0",
     "dotenv": "^10.0.0",
     "js-sha256": "^0.9.0",
