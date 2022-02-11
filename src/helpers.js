@@ -16,6 +16,11 @@ export const printMissingCoinsMessage = (symbols) => {
   console.log(messages.getMissingCoinsMessage(symbols));
 };
 
+export const printErrorMessage = (error) => {
+  /* eslint-disable-next-line no-console */
+  console.log(messages.getErrorMessage(error));
+};
+
 export const printUploadCompletedMessage = (priceData) => {
   const assets = priceData
     .map((asset) => asset.symbol.toUpperCase())
@@ -81,7 +86,8 @@ export const getPriceData = async (ids) => {
       date: new Date(data[key].last_updated_at * 1000).toLocaleString(),
     }));
   } catch (error) {
-    console.log(`Error fetching price data: ${error}`);
+    printErrorMessage(error);
+    return [];
   }
 };
 
@@ -94,7 +100,6 @@ export const verifyPriceData = (assets = [], geckoIds = [], priceData = []) => {
           (pd) => symbol.toUpperCase() === pd.symbol.toUpperCase()
         )
     );
-    console.log('MISSNIG', missingSymbols);
     if (missingSymbols.length) {
       helpers.printMissingCoinsMessage(missingSymbols);
     }

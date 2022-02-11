@@ -82,25 +82,23 @@ export const getChangedAssets = async (
       userSignature,
       walletSignature,
     });
-    if (!signatureMatch) {
-      const lastEntry = collection
-        .find({ userSignature })
-        .limit(1)
-        .sort({ $natural: -1 });
-      const lastEntryList = await lastEntry.toArray();
-      await collection.insertOne({ userSignature, walletSignature, assets });
+    if (signatureMatch) {
       client.close();
-      printInfoMessage(userSignature);
-      const previousAssets = lastEntryList.length
-        ? lastEntryList[0].assets
-        : [];
-      return findChangedAssets(previousAssets, assets);
+      return [];
     }
+    const lastEntry = collection
+      .find({ userSignature })
+      .limit(1)
+      .sort({ $natural: -1 });
+    const lastEntryList = await lastEntry.toArray();
+    await collection.insertOne({ userSignature, walletSignature, assets });
     client.close();
-    return [];
+    printInfoMessage(userSignature);
+    const previousAssets = lastEntryList.length ? lastEntryList[0].assets : [];
+    return findChangedAssets(previousAssets, assets);
   } catch (error) {
     /* eslint-disable-next-line no-console */
     console.log('Error while verifying signature:', error);
-    return null;
+    return [];
   }
 };
