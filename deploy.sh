@@ -24,7 +24,7 @@ echo "Project dependencies was installed"
 
 echo "Rebooting crypto-price-sniffer application"
 
-if [[ $BRANCH_NAME == "master" ]]; then
+if [[ $BRANCH_NAME == "master" || $BRANCH_NAME == "main" ]]; then
         echo "pm2 restart crypto-price-sniffer"
 else
     exit 0;
