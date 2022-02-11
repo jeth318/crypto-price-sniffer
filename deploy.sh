@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 BRANCH_NAME=$1;
 
-if [[ $BRANCH_NAME == "master" ]]; then
+if [[ $BRANCH_NAME == "master" || $BRANCH_NAME == "main" ]]; then
         cd /home/pi/Apps/crypto-price-sniffer
 else
         exit 0;
@@ -19,7 +19,7 @@ echo "Pulled successfully"
 
 
 echo "Installing dependencies"
-npm install
+npm ci
 echo "Project dependencies was installed"
 
 echo "Rebooting crypto-price-sniffer application"
