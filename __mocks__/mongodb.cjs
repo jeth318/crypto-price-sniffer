@@ -5,6 +5,7 @@ const mockInsertOne = jest.fn(async () => Promise.resolve('insertOne'));
 const mockLimit = jest.fn().mockReturnThis();
 const mockSort = jest.fn().mockReturnThis();
 const mockToArray = jest.fn().mockReturnThis();
+const mockClose = jest.fn();
 
 let mockCollection = jest.fn(() => ({
   insertMany: mockInsertMany,
@@ -19,7 +20,7 @@ let mockCollection = jest.fn(() => ({
 class MongoClient {
   constructor() {
     this.connect = async () => Promise.resolve('connected');
-    this.close = jest.fn();
+    this.close = mockClose;
     this.db = () => ({
       collection: mockCollection,
     });
@@ -35,4 +36,5 @@ module.exports = {
   mockLimit,
   mockSort,
   mockToArray,
+  mockClose,
 };

@@ -26,6 +26,8 @@ describe('app', () => {
     uploadPricesStub = jest
       .spyOn(db, 'uploadPrices')
       .mockImplementation(() => null);
+
+    consoleStub = jest.spyOn(console, 'log').mockImplementation(() => null);
   });
 
   afterEach(() => {
@@ -61,5 +63,26 @@ describe('app', () => {
       'assets'
     );
     expect(uploadPricesStub).toHaveBeenCalledTimes(0);
+  });
+
+  it('should catch error and pass it as argument to errorLogger', async () => {
+    const errorLoggerStub = jest.spyOn(helpers, 'errorLogger');
+    getChangedAssetsStub.mockImplementation(() => {
+      return Promise.reject(new Error('oops'));
+    });
+
+    await app.run();
+    expect(errorLoggerStub).toHaveBeenCalledTimes(1);
+    expect(errorLoggerStub).toHaveBeenCalledWith(new Error('oops'));
+  });
+
+  it('should catch error and pass it as argument to printErrorMessage', async () => {
+    const printErrorMessageStub = jest.spyOn(helpers, 'printErrorMessage');
+    getChangedAssetsStub.mockImplementation(() => {
+      return Promise.reject(new Error('oops'));
+    });
+
+    await app.run();
+    expect(printErrorMessageStub).toHaveBeenCalledWith(new Error('oops'));
   });
 });

@@ -9,6 +9,7 @@ describe('db', () => {
   let consoleStub;
   let findChangedAssetsStub;
   let printInfoMessageStub;
+  let printUploadCompletedMessageStub;
 
   beforeEach(() => {
     mockMongoDb.mockFindOne.mockImplementation(async () => null);
@@ -18,6 +19,9 @@ describe('db', () => {
     ]);
     printInfoMessageStub = jest
       .spyOn(helpers, 'printInfoMessage')
+      .mockImplementation(() => null);
+    printUploadCompletedMessageStub = jest
+      .spyOn(helpers, 'printUploadCompletedMessage')
       .mockImplementation(() => null);
     findChangedAssetsStub = jest
       .spyOn(helpers, 'findChangedAssets')
@@ -34,6 +38,7 @@ describe('db', () => {
 
   describe('uploadPrices', () => {
     it('should call insertMany with correct arguments', async () => {
+      consoleStub.mockRestore();
       const getPriceDataStub = jest
         .spyOn(helpers, 'getPriceData')
         .mockImplementation(async () => Promise.resolve('priceData'));
@@ -41,16 +46,38 @@ describe('db', () => {
         .spyOn(helpers, 'verifyPriceData')
         .mockImplementation(() => null);
       const assets = [{ geckoId: 'gid', symbol: 'symbol' }];
-
       await db.uploadPrices(assets);
-
       expect(getGeckoIdsFromAssetsStub).toHaveBeenCalledWith(assets);
       expect(getPriceDataStub).toHaveBeenCalledWith(['gid1, gid2']);
       expect(mockMongoDb.mockInsertMany).toHaveBeenCalledWith('priceData');
+      expect(mockMongoDb.mockClose).toHaveBeenCalledTimes(1);
+      expect(printUploadCompletedMessageStub).toHaveBeenCalledWith('priceData');
       expect(verifyPriceDataStub).toHaveBeenCalledWith(
         assets,
         ['gid1, gid2'],
         'priceData'
+      );
+    });
+
+    it('should call client.close when no priceData length', async () => {
+      consoleStub.mockRestore();
+      const getPriceDataStub = jest
+        .spyOn(helpers, 'getPriceData')
+        .mockImplementation(async () => Promise.resolve(''));
+      const verifyPriceDataStub = jest
+        .spyOn(helpers, 'verifyPriceData')
+        .mockImplementation(() => null);
+      const assets = [{ geckoId: 'gid', symbol: 'symbol' }];
+      await db.uploadPrices(assets);
+      expect(getGeckoIdsFromAssetsStub).toHaveBeenCalledWith(assets);
+      expect(getPriceDataStub).toHaveBeenCalledWith(['gid1, gid2']);
+      expect(mockMongoDb.mockInsertMany).not.toHaveBeenCalled();
+      expect(mockMongoDb.mockClose).toHaveBeenCalledTimes(1);
+      expect(printUploadCompletedMessageStub).not.toHaveBeenCalled();
+      expect(verifyPriceDataStub).toHaveBeenCalledWith(
+        [{ geckoId: 'gid', symbol: 'symbol' }],
+        ['gid1, gid2'],
+        ''
       );
     });
 
@@ -123,7 +150,6 @@ describe('db', () => {
       );
     });
     it('should call findChangedAssets with correct arguments', async () => {
-      consoleStub.mockRestore();
       const result = await db.getChangedAssets(...defaultPayload);
       expect(result).toEqual('changedAssets');
       expect(findChangedAssetsStub).toHaveBeenCalledWith(
