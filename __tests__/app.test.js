@@ -11,7 +11,6 @@ describe('app', () => {
   let getAssetsStub;
   let getChangedAssetsStub;
   let uploadPricesStub;
-  let consoleStub;
 
   beforeEach(() => {
     getAssetsStub = jest.spyOn(helpers, 'getAssets').mockImplementation(() => {
@@ -28,7 +27,7 @@ describe('app', () => {
       .spyOn(db, 'uploadPrices')
       .mockImplementation(() => null);
 
-    consoleStub = jest.spyOn(console, 'log').mockImplementation(() => null);
+    jest.spyOn(console, 'log').mockImplementation(() => null);
   });
 
   afterEach(() => {

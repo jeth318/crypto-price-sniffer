@@ -2,8 +2,12 @@ import dotenv from 'dotenv';
 import { sha256 } from 'js-sha256';
 import { Spot } from '@binance/connector';
 import { getChangedAssets, uploadPrices } from './db.js';
-import { getAssets, printErrorMessage } from './helpers.js';
-import { errorLogger, printMissingEnvMessage } from './helpers.js';
+import {
+  getAssets,
+  printErrorMessage,
+  errorLogger,
+  printMissingEnvMessage,
+} from './helpers.js';
 
 dotenv.config();
 const apiKey = process.env.BINANCE_API_KEY;

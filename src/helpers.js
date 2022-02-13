@@ -27,7 +27,6 @@ export const printMissingEnvMessage = () => {
   console.log(messages.getMissingEnvMessage());
 };
 
-
 export const printUploadCompletedMessage = (priceData) => {
   const assets = priceData
     .map((asset) => asset.symbol.toUpperCase())
