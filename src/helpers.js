@@ -22,6 +22,12 @@ export const printErrorMessage = (error) => {
   console.log(messages.getErrorMessage(error));
 };
 
+export const printMissingEnvMessage = () => {
+  /* eslint-disable-next-line no-console */
+  console.log(messages.getMissingEnvMessage());
+};
+
+
 export const printUploadCompletedMessage = (priceData) => {
   const assets = priceData
     .map((asset) => asset.symbol.toUpperCase())

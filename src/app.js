@@ -3,7 +3,7 @@ import { sha256 } from 'js-sha256';
 import { Spot } from '@binance/connector';
 import { getChangedAssets, uploadPrices } from './db.js';
 import { getAssets, printErrorMessage } from './helpers.js';
-import { errorLogger } from './helpers.js';
+import { errorLogger, printMissingEnvMessage } from './helpers.js';
 
 dotenv.config();
 const apiKey = process.env.BINANCE_API_KEY;
@@ -31,4 +31,10 @@ export const run = async () => {
   }
 };
 
-export default setInterval(run, pollInterval);
+export default (() => {
+  if (apiKey && apiSecret) {
+    setInterval(run, pollInterval);
+  } else {
+    printMissingEnvMessage();
+  }
+})();
