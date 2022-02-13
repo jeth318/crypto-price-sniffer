@@ -8,6 +8,13 @@ module.exports = {
   rules: {
     quotes: [2, 'single', { avoidEscape: true }],
     'import/no-self-import': 0,
+    'import/extensions': [
+      'error',
+      {
+        js: 'ignorePackages',
+        json: 'ignorePackages',
+      },
+    ],
   },
   parserOptions: {
     ecmaVersion: 'latest',
@@ -15,7 +22,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['**/*.test.js'],
+      files: ['**/*.test.js', '**/__mocks__/*'],
       env: {
         jest: true,
       },
