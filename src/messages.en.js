@@ -22,6 +22,20 @@ export const getMissingCoinsMessage = (symbols) => {
   `.dedent();
 };
 
+export const getMissingEnvMessage = () => {
+  return `
+    The binance api credentials are not defined or are invalid.
+    Verify that the following envorinment variables are set in a .env file:
+    * BINANCE_API_KEY
+    * BINANCE_API_SECRET
+    * MONGODB_ENDPOINT
+    * DB_PASSWORD
+    * DB_USERNAME
+    * DB_NAME
+    * POLL_INTERVALL (defaults to 1 minute in ms)
+  `.dedent();
+};
+
 export const getErrorMessage = (error) => {
   if (error.isAxiosError) {
     return `

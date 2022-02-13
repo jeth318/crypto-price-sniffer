@@ -1,8 +1,8 @@
 import axios from 'axios';
 import * as helpers from '../src/helpers';
 import * as messages from '../src/messages.en';
+import * as winston from '../src/winston';
 
-jest.mock('axios');
 describe('helpers', () => {
   let logStub;
   let getNewWalletSignatureMessageStub;
@@ -249,7 +249,7 @@ describe('helpers', () => {
     });
 
     it('should catch error and call it out through console log', async () => {
-      // axios.get.mockReturnValue(Promise.reject('error_123'));
+      const printErrorMessageStub = jest.spyOn(helpers, 'printErrorMessage');
       axios.get.mockImplementation(() => {
         throw new Error('oops');
       });
@@ -257,13 +257,25 @@ describe('helpers', () => {
       try {
         await helpers.getPriceData(['btc']);
       } catch (error) {
-        expect(logStub).toHaveBeenCalledWith(
-          'Error fetching price data: Error: oops'
-        );
+        expect(printErrorMessageStub).toHaveBeenCalledWith(new Error('oops'));
 
         expect(axios.get).toHaveBeenCalledWith(
           'https://api.coingecko.com/api/v3/simple/price?ids=btc&vs_currencies=sek%2Cusd&include_last_updated_at=true'
         );
+      }
+    });
+
+    it('should catch error and call errorLogger with correct arguments', async () => {
+      axios.get.mockImplementation(() => {
+        throw new Error('oops');
+      });
+
+      const errorLoggerStub = jest.spyOn(helpers, 'errorLogger');
+
+      try {
+        await helpers.getPriceData(['btc']);
+      } catch (error) {
+        expect(errorLoggerStub).toHaveBeenCalledWith(new Error('oops'));
       }
     });
 
@@ -292,6 +304,7 @@ describe('helpers', () => {
       helpers.verifyPriceData(['asset1'], ['geckoId1'], []);
 
       expect(printMissingCoinsMessageStub).not.toHaveBeenCalled();
+      expect(winston.appLogger.info).not.toHaveBeenCalledWith();
     });
 
     it('should do nothing when no missing symbols', () => {
@@ -308,22 +321,7 @@ describe('helpers', () => {
       helpers.verifyPriceData([], ['geckoId1'], []);
 
       expect(printMissingCoinsMessageStub).not.toHaveBeenCalled();
-    });
-
-    it('should console log missing coins message', () => {
-      const printMissingCoinsMessageStub = jest
-        .spyOn(helpers, 'printMissingCoinsMessage')
-        .mockImplementation(() => 'geckoSymbol');
-
-      const assets = [{ asset: 'btc' }];
-      const priceData = [{ symbol: 'BTC' }];
-      helpers.verifyPriceData(assets, [], priceData);
-
-      expect(printMissingCoinsMessageStub).not.toHaveBeenCalled();
-
-      helpers.verifyPriceData(assets, ['geckoId1'], []);
-
-      expect(printMissingCoinsMessageStub).not.toHaveBeenCalled();
+      expect(winston.appLogger.info).not.toHaveBeenCalledWith();
     });
 
     it('should do nothing when given no assets and geckoIds have identical length', () => {
@@ -343,6 +341,34 @@ describe('helpers', () => {
       ]);
     });
 
+    it('should call appLogger error with correct arguments when missing coins', () => {
+      const assets = [{ asset: 'btc' }, { asset: 'aave' }];
+      const priceData = [{ symbol: 'geckoId1' }];
+      const geckoIds = ['btc'];
+      const expectedArguments = {
+        assets: [{ asset: 'btc' }, { asset: 'aave' }],
+        missingSymbols: ['BTC', 'AAVE'],
+        priceData: [{ symbol: 'geckoId1' }],
+      };
+      helpers.verifyPriceData(assets, geckoIds, priceData);
+
+      expect(winston.appLogger.info).toHaveBeenCalledWith(expectedArguments);
+    });
+
+    it('should call logger with correct arguments when missing coins', () => {
+      const assets = [{ asset: 'btc' }, { asset: 'aave' }];
+      const priceData = [{ symbol: 'geckoId1' }];
+      const geckoIds = ['btc'];
+      const expectedArguments = {
+        assets: [{ asset: 'btc' }, { asset: 'aave' }],
+        missingSymbols: ['BTC', 'AAVE'],
+        priceData: [{ symbol: 'geckoId1' }],
+      };
+      helpers.verifyPriceData(assets, geckoIds, priceData);
+
+      expect(winston.appLogger.info).toHaveBeenCalledWith(expectedArguments);
+    });
+
     it('should default all arguments as empty arrays', () => {
       const printMissingCoinsMessageStub = jest
         .spyOn(helpers, 'printMissingCoinsMessage')
@@ -351,6 +377,39 @@ describe('helpers', () => {
       helpers.verifyPriceData();
 
       expect(printMissingCoinsMessageStub).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('errorLogger', () => {
+    const networkErrorLogStub = jest.fn();
+    const appErrorLogStub = jest.fn();
+
+    beforeEach(() => {
+      winston.appLogger.error = appErrorLogStub;
+      winston.networkLogger.error = networkErrorLogStub;
+    });
+    afterEach(() => {
+      winston.appLogger.error.mockRestore();
+      winston.networkLogger.error.mockRestore();
+    });
+    it('should call networkLogger when isAxiosError is true', () => {
+      helpers.errorLogger({ isAxiosError: true });
+      expect(appErrorLogStub).not.toHaveBeenCalled();
+      expect(networkErrorLogStub).toHaveBeenCalledWith({
+        message: {
+          isAxiosError: true,
+        },
+      });
+    });
+
+    it('should call appLogger when isAxiosError is false', () => {
+      helpers.errorLogger({ isAxiosError: false });
+      expect(networkErrorLogStub).not.toHaveBeenCalled();
+      expect(appErrorLogStub).toHaveBeenCalledWith({
+        message: {
+          isAxiosError: false,
+        },
+      });
     });
   });
 });

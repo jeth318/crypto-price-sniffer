@@ -3,6 +3,7 @@ import axios from 'axios';
 import coinList from '../complete-coinlist.json';
 import * as helpers from './helpers.js';
 import * as messages from './messages.en.js';
+import { appLogger, networkLogger } from './winston.js';
 
 const { nameLookup } = cs.cryptoSymbol({});
 
@@ -20,6 +21,12 @@ export const printErrorMessage = (error) => {
   /* eslint-disable-next-line no-console */
   console.log(messages.getErrorMessage(error));
 };
+
+export const printMissingEnvMessage = () => {
+  /* eslint-disable-next-line no-console */
+  console.log(messages.getMissingEnvMessage());
+};
+
 
 export const printUploadCompletedMessage = (priceData) => {
   const assets = priceData
@@ -72,10 +79,9 @@ export const getGeckoIdsFromAssets = (assets) =>
     .filter((id) => !!id);
 
 export const getPriceData = async (ids) => {
-  const encodedIds = encodeURIComponent(ids.toString());
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodedIds}&vs_currencies=sek%2Cusd&include_last_updated_at=true`;
-
   try {
+    const encodedIds = encodeURIComponent(ids.toString());
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodedIds}&vs_currencies=sek%2Cusd&include_last_updated_at=true`;
     const { data } = await axios.get(url);
     return Object.keys(data).map((key) => ({
       id: key,
@@ -86,7 +92,8 @@ export const getPriceData = async (ids) => {
       date: new Date(data[key].last_updated_at * 1000).toLocaleString(),
     }));
   } catch (error) {
-    printErrorMessage(error);
+    helpers.errorLogger(error);
+    helpers.printErrorMessage(error);
     return [];
   }
 };
@@ -101,7 +108,16 @@ export const verifyPriceData = (assets = [], geckoIds = [], priceData = []) => {
         )
     );
     if (missingSymbols.length) {
+      appLogger.info({ missingSymbols, assets, priceData });
       helpers.printMissingCoinsMessage(missingSymbols);
     }
+  }
+};
+
+export const errorLogger = (data) => {
+  if (data.isAxiosError) {
+    networkLogger.error({ message: data });
+  } else {
+    appLogger.error({ message: data });
   }
 };

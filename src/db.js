@@ -26,11 +26,13 @@ export const uploadPrices = async (assets) => {
 
     const priceData = await getPriceData(geckoIds);
     verifyPriceData(assets, geckoIds, priceData);
-    if (priceData.length) {
-      await collection.insertMany(priceData);
-      printUploadCompletedMessage(priceData);
+    if (!priceData.length) {
+      client.close();
+      return;
     }
+    await collection.insertMany(priceData);
     client.close();
+    printUploadCompletedMessage(priceData);
   } catch (error) {
     /* eslint-disable-next-line no-console */
     console.log('Error while updating the datebase:', error);
