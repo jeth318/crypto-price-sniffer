@@ -1,8 +1,6 @@
-import * as mockMongoDb from '../__mocks__/mongodb.cjs';
+import * as mockMongoDb from '../__mocks__/mongodb.js';
 import * as db from '../src/db';
 import * as helpers from '../src/helpers';
-
-jest.mock('mongodb', () => mockMongoDb);
 
 describe('db', () => {
   let getGeckoIdsFromAssetsStub;
