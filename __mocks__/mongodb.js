@@ -27,7 +27,7 @@ class MongoClient {
   }
 }
 
-module.exports = {
+export {
   MongoClient,
   mockInsertMany,
   mockFindOne,

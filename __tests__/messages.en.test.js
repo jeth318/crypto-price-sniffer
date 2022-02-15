@@ -1,7 +1,4 @@
-import * as mockChalk from '../__mocks__/chalk.cjs';
 import * as messages from '../src/messages.en';
-
-jest.mock('chalk', () => mockChalk);
 
 describe('messages', () => {
   describe('getNewWalletSignatureMessage', () => {

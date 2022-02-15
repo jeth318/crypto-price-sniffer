@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import * as mongodb from 'mongodb';
+import { MongoClient } from 'mongodb';
 
 import {
   getGeckoIdsFromAssets,
@@ -14,7 +14,7 @@ dotenv.config();
 
 const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
 const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${MONGODB_ENDPOINT}`;
-const client = new mongodb.MongoClient(url);
+const client = new MongoClient(url);
 const dbName = process.env.DB_NAME;
 
 export const uploadPrices = async (assets) => {

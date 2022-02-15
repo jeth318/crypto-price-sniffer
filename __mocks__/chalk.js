@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   green: { italic: (assets) => assets },
   grey: (arg) => arg,
   redBright: (arg) => arg,
