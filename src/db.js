@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
 
 import {
@@ -9,8 +8,6 @@ import {
   findChangedAssets,
   printUploadCompletedMessage,
 } from './helpers.js';
-
-dotenv.config();
 
 const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
 const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${MONGODB_ENDPOINT}`;
@@ -80,6 +77,10 @@ export const getChangedAssets = async (
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('signatures');
+    console.log({
+      userSignature,
+      walletSignature,
+    });
     const signatureMatch = await collection.findOne({
       userSignature,
       walletSignature,

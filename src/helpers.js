@@ -1,4 +1,4 @@
-import cs from 'crypto-symbol';
+import * as cs from 'crypto-symbol';
 import axios from 'axios';
 import coinList from '../complete-coinlist.json';
 import * as helpers from './helpers.js';
