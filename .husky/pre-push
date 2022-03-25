@@ -1,15 +1,18 @@
 #!/bin/sh
-node node_modules/git-branch-is/bin/git-branch-is.js -q main
+
+gitbranchsis=node_modules/git-branch-is/bin/git-branch-is.js
+
+node $gitbranchsis -q main
 if [[ $? == 0 ]]; then
     echo "On main branch. Will build and ship to server"
     npm run build
     echo "Shipping the production bundle to the server"
-    #rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@ton-618.ddns.net:/home/jeth/apps/crypto-price-sniffer/production/client
+    rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@ton-618.ddns.net:/home/jeth/apps/crypto-price-sniffer/production
 else
-    node node_modules/git-branch-is/bin/git-branch-is.js -q staging
+    node $gitbranchsis -q add-webpack
     if [[ $? == 0 ]]; then
         echo "Shipping the staging bundle to the server"
-        #rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@ton-618.ddns.net:/home/jeth/apps/crypto-price-sniffer/staging/client
+        #rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@ton-618.ddns.net:/home/jeth/apps/crypto-price-sniffer/staging
     else
         echo "Skipping build and deployment"
     fi
