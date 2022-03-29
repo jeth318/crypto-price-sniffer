@@ -5,3 +5,7 @@ coverage/
 globalConfig.json
 logs/
 dist
+<<<<<<< HEAD
+=======
+.husky/_
+>>>>>>> main

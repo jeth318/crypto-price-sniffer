@@ -9,6 +9,10 @@ import {
   printUploadCompletedMessage,
 } from './helpers.js';
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
 const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${MONGODB_ENDPOINT}`;
 const client = new MongoClient(url);
