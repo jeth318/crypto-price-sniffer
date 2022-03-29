@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import { sha256 } from 'js-sha256';
 import { Spot } from '@binance/connector';
 import { getChangedAssets, uploadPrices } from './db.js';
@@ -9,7 +8,6 @@ import {
   printMissingEnvMessage,
 } from './helpers.js';
 
-dotenv.config();
 const apiKey = process.env.BINANCE_API_KEY;
 const apiSecret = process.env.BINANCE_API_SECRET;
 const pollInterval = process.env.POLL_INTERVAL || 60000;
