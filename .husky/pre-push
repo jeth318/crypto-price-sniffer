@@ -1,0 +1,7 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npm run build
+echo "Shipping dist to server"
+rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/* jeth@10.0.128.110:/home/jeth/apps/crypto-price-sniffer/api
+

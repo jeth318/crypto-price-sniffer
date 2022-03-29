@@ -5,3 +5,4 @@ coverage/
 globalConfig.json
 logs/
 dist
+.husky/_
