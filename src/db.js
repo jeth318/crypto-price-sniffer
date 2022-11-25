@@ -9,10 +9,6 @@ import {
   printUploadCompletedMessage,
 } from './helpers.js';
 
-<<<<<<< HEAD
-=======
-
->>>>>>> main
 const { DB_USERNAME, DB_PASSWORD, MONGODB_ENDPOINT } = process.env;
 const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${MONGODB_ENDPOINT}`;
 const client = new MongoClient(url);
@@ -52,7 +48,7 @@ export const getClosestMatch = async ({ info, symbol }) => {
     const closestMatch = prices.reduce(
       (a, b) =>
         Math.abs(info.time - a.last_updated_at) <
-        Math.abs(info.time - b.last_updated_at)
+          Math.abs(info.time - b.last_updated_at)
           ? a
           : b,
       {}
