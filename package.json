@@ -6,7 +6,7 @@
   "type": "module",
   "prepush": "npm run lint && npm run coverage && npm run coverage-check && npm run coverage-update",
   "scripts": {
-    "start": "node --experimental-json-modules src/app.js",
+    "start": "node --experimental-json-modules src/main.js",
     "build": "./node_modules/esbuild/bin/esbuild src/main.js --platform=node --bundle --outfile=dist/app.cjs",
     "test": "./node_modules/.bin/jest",
     "coverage": "./node_modules/.bin/jest --coverage",
