@@ -77,10 +77,7 @@ export const getChangedAssets = async (
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('signatures');
-    console.log({
-      userSignature,
-      walletSignature,
-    });
+
     const signatureMatch = await collection.findOne({
       userSignature,
       walletSignature,
