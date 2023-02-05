@@ -1,6 +1,6 @@
 {
   "name": "crypto-price-sniffer",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "",
   "exports": "./app.js",
   "type": "module",
