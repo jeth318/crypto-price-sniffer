@@ -1,6 +1,6 @@
 import cs from 'crypto-symbol';
 import axios from 'axios';
-import coinList from '../complete-coinlist.json';
+import coinList from '../complete-coinlist.json' assert { type: "json" };
 import * as helpers from './helpers.js';
 import * as messages from './messages.en.js';
 import { appLogger, networkLogger } from './winston.js';
