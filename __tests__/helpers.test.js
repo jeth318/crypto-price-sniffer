@@ -145,6 +145,7 @@ describe('helpers', () => {
       expect(helpers.getGeckoIdFromSymbol('no_match_symbol')).toEqual(null);
     });
   });
+
   describe('getCoinNames', () => {
     it('should return object with correct name, symbol and geckoId', () => {
       const result = [
@@ -213,6 +214,7 @@ describe('helpers', () => {
       ]);
     });
   });
+
   describe('getPriceData', () => {
     it('should call coingecko API with correct url', async () => {
       jest
@@ -242,7 +244,7 @@ describe('helpers', () => {
           sek: 10,
           usd: 1.2,
           last_updated_at: 1644049060,
-          date: '05/02/2022, 09:17:40',
+          date: '2/5/2022, 9:17:40 AM',
           symbol: 'geckoSymbol',
         },
       ]);

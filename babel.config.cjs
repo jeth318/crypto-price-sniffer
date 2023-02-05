@@ -1,6 +1,9 @@
 module.exports = {
   presets: ['@babel/preset-env'],
-  plugins: ['@babel/plugin-transform-runtime'],
+  plugins: [
+    '@babel/plugin-transform-runtime',
+    '@babel/plugin-syntax-import-assertions',
+  ],
   env: {
     testing: {
       presets: [['@babel/preset-env', { targets: { node: 'current' } }]],

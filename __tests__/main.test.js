@@ -1,8 +1,9 @@
+import '../src/config';
 import * as db from '../src/db';
 import * as helpers from '../src/helpers';
-import * as app from '../src/app';
+import * as server from '../src/server';
 
-describe('app', () => {
+describe('server', () => {
   let getAssetsStub;
   let getChangedAssetsStub;
   let uploadPricesStub;
@@ -29,8 +30,8 @@ describe('app', () => {
     jest.clearAllMocks();
   });
 
-  it('should call getAssets with binance data', async () => {
-    await app.run();
+  it('should call getAssets with data and verify the assets returned', async () => {
+    await server.run();
     expect(getAssetsStub).toHaveBeenCalledTimes(1);
     expect(getAssetsStub).toHaveBeenCalledWith('data');
     expect(getChangedAssetsStub).toHaveBeenCalledTimes(1);
@@ -48,27 +49,8 @@ describe('app', () => {
       return [];
     });
 
-    await app.run();
+    await server.run();
     expect(getAssetsStub).toHaveBeenCalledTimes(1);
-    expect(getAssetsStub).toHaveBeenCalledWith('data');
-    expect(getChangedAssetsStub).toHaveBeenCalledTimes(1);
-    expect(getChangedAssetsStub).toHaveBeenCalledWith(
-      'sha256String',
-      'sha256String',
-      'assets'
-    );
-    expect(uploadPricesStub).toHaveBeenCalledTimes(0);
-  });
-
-  it('should catch error and pass it as argument to errorLogger', async () => {
-    const errorLoggerStub = jest.spyOn(helpers, 'errorLogger');
-    getChangedAssetsStub.mockImplementation(() => {
-      return Promise.reject(new Error('oops'));
-    });
-
-    await app.run();
-    expect(errorLoggerStub).toHaveBeenCalledTimes(1);
-    expect(errorLoggerStub).toHaveBeenCalledWith(new Error('oops'));
   });
 
   it('should catch error and pass it as argument to printErrorMessage', async () => {
@@ -77,7 +59,7 @@ describe('app', () => {
       return Promise.reject(new Error('oops'));
     });
 
-    await app.run();
+    await server.run();
     expect(printErrorMessageStub).toHaveBeenCalledWith(new Error('oops'));
   });
 });

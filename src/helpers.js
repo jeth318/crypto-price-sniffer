@@ -1,6 +1,6 @@
-import * as cs from 'crypto-symbol';
+import cs from 'crypto-symbol';
 import axios from 'axios';
-import coinList from '../complete-coinlist.json' assert { type: "json" };
+import coinList from '../complete-coinlist.json';
 import * as helpers from './helpers.js';
 import * as messages from './messages.en.js';
 import { appLogger, networkLogger } from './winston.js';
@@ -88,7 +88,7 @@ export const getPriceData = async (ids) => {
       last_updated_at: data[key].last_updated_at,
       sek: data[key].sek,
       usd: data[key].usd,
-      date: new Date(data[key].last_updated_at * 1000).toLocaleString(),
+      date: `${new Date(data[key].last_updated_at * 1000).toLocaleString()}`,
     }));
   } catch (error) {
     helpers.errorLogger(error);

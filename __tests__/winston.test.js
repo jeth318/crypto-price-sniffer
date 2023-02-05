@@ -1,5 +1,6 @@
 import * as winston from '../src/winston.js';
 import * as winstonMock from '../__mocks__/winston.js';
+
 describe('winston', () => {
   describe('networkLogger', () => {
     it('should return correct object', () => {
