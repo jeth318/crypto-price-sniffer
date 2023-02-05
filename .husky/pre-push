@@ -6,7 +6,6 @@ node $gitbranchsis -q main
 if [[ $? == 0 ]]; then
     echo "On main branch. Will build and ship to server"
     npm run build
-    npm version patch
     echo "Shipping the production bundle to the server"
     rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@elara.local:/home/jeth/apps/crypto-price-sniffer/production
 else
