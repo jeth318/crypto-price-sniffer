@@ -48,7 +48,7 @@ export const getClosestMatch = async ({ info, symbol }) => {
     const closestMatch = prices.reduce(
       (a, b) =>
         Math.abs(info.time - a.last_updated_at) <
-          Math.abs(info.time - b.last_updated_at)
+        Math.abs(info.time - b.last_updated_at)
           ? a
           : b,
       {}
