@@ -1,9 +1,13 @@
+import { ClientAccount, Coin, PriceData, AxiosFetchError } from './types/index';
 import cs from 'crypto-symbol';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+
+// eslint-disable-next-line
 import coinList from '../complete-coinlist.json' assert { type: "json" };
-import * as helpers from './helpers.js';
-import * as messages from './messages.en.js';
-import { appLogger, networkLogger } from './winston.js';
+import * as helpers from './helpers';
+import * as messages from './messages.en';
+import { appLogger, networkLogger } from './winston';
+import { Asset } from './types';
 
 const { nameLookup } = cs.cryptoSymbol({});
 
@@ -37,47 +41,45 @@ export const printUploadCompletedMessage = (priceData) => {
   console.log(messages.getUploadCompletedMessage(assets));
 };
 
-export const getAssets = (data) =>
+export const getAssets = (data: ClientAccount): Asset[] =>
   data.balances.filter(
     ({ free, locked }) => parseFloat(free) > 0 || parseFloat(locked) > 0
   );
 
-export const findChangedAssets = async (previousAssets, assets) =>
+export const findChangedAssets = async (previousAssets: Asset[], assets: Asset[]) =>
   assets.filter(({ asset, locked, free }) => {
     const comp = previousAssets.find((pa) => pa.asset === asset);
     return comp ? comp.free !== free || comp.locked !== locked : asset;
   });
 
-export const getGeckoSymbolFromGeckoId = (geckoId) => {
+export const getGeckoSymbolFromGeckoId = (geckoId: string) => {
   const match = coinList.find(
     ({ id }) => id.toLocaleUpperCase() === geckoId.toUpperCase()
   );
   return match ? match.symbol : null;
 };
 
-export const getGeckoIdFromSymbol = (symbol) => {
+export const getGeckoIdFromSymbol = (symbol: string) => {
   const matches = coinList.filter(
     (coin) => coin.symbol.toUpperCase() === symbol.toUpperCase()
   );
   return matches.length ? matches[0].id : null;
 };
 
-export const getCoinNames = (assets) =>
-  assets.map(({ asset }) => {
-    return {
-      name: nameLookup(asset),
-      symbol: asset,
-      geckoId: helpers.getGeckoIdFromSymbol(asset),
-    };
-  });
+export const getCoinNames = (assets: Asset[]) =>
+  assets.map(({ asset }) => ({
+    name: nameLookup(asset),
+    symbol: asset,
+    geckoId: helpers.getGeckoIdFromSymbol(asset)
+  }));
 
-export const getGeckoIdsFromAssets = (assets) =>
+export const getGeckoIdsFromAssets = (assets: Asset[]) =>
   helpers
     .getCoinNames(assets)
     .map(({ geckoId }) => geckoId)
     .filter((id) => !!id);
 
-export const getPriceData = async (ids) => {
+export const getPriceData = async (ids: Coin["geckoId"][]) => {
   try {
     const encodedIds = encodeURIComponent(ids.toString());
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodedIds}&vs_currencies=sek%2Cusd&include_last_updated_at=true`;
@@ -97,7 +99,7 @@ export const getPriceData = async (ids) => {
   }
 };
 
-export const verifyPriceData = (assets = [], geckoIds = [], priceData = []) => {
+export const verifyPriceData = (assets: Asset[], geckoIds: Coin["geckoId"], priceData: PriceData[]) => {
   if (assets.length !== geckoIds.length) {
     const assetsSymbols = assets.map((asset) => asset.asset.toUpperCase());
     const missingSymbols = assetsSymbols.filter(
@@ -113,8 +115,8 @@ export const verifyPriceData = (assets = [], geckoIds = [], priceData = []) => {
   }
 };
 
-export const errorLogger = (data) => {
-  if (data.isAxiosError) {
+export const errorLogger = (data: any) => {
+  if (data?.isAxiosError) {
     networkLogger.error({ message: data });
   } else {
     appLogger.error({ message: data });

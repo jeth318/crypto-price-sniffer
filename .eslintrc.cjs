@@ -4,7 +4,13 @@ module.exports = {
     es2021: true,
   },
   plugins: ['prettier'],
-  extends: ['airbnb-base', 'plugin:prettier/recommended'],
+  extends: [
+    'airbnb-base',
+    'plugin:prettier/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
+  ],
   rules: {
     quotes: [2, 'single', { avoidEscape: true }],
     'import/no-self-import': 0,
