@@ -19,7 +19,7 @@
   "license": "private",
   "dependencies": {
     "@babel/preset-env": "^7.16.11",
-    "@binance/connector": "^1.6.0",
+    "@binance/connector": "^3.4.0",
     "axios": "^0.24.0",
     "chalk": "^4.1.2",
     "crypto-symbol": "^3.2.0",
