@@ -7,12 +7,12 @@ if [[ $? == 0 ]]; then
     echo "On main branch. Will build and ship to server."
     npm run build
     echo "Shipping the production bundle to the server."
-    rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@elara.local:/home/jeth/apps/crypto-price-sniffer/production
+    rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@pipher:/home/jeth/apps/crypto-price-sniffer/production
 else
     node $gitbranchsis -q staging
     if [[ $? == 0 ]]; then
         echo "Shipping the staging bundle to the server."
-        rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@elara.local:/home/jeth/apps/crypto-price-sniffer/staging
+        rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@pipher:/home/jeth/apps/crypto-price-sniffer/staging
     else
         echo "Skipping build and deployment."
     fi
