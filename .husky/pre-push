@@ -12,7 +12,7 @@ else
     node $gitbranchsis -q staging
     if [[ $? == 0 ]]; then
         echo "Shipping the staging bundle to the server."
-        rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@pihper:/home/jeth/apps/crypto-price-sniffer/staging
+        rsync -arvz -e 'ssh -p 2244' --progress $(pwd)/dist/ jeth@pipher:/home/jeth/apps/crypto-price-sniffer/staging
     else
         echo "Skipping build and deployment."
     fi
